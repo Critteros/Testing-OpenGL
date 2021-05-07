@@ -57,6 +57,11 @@ set_target_properties(fmt PROPERTIES FOLDER "external-library")
 
 #Advanced setup
 set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+
 #set_property(GLOBAL PROPERTY USE_FOLDERS OFF CACHE "" FORCE)
+
+
+#Preprocessor Defines
+add_compile_definitions(GLFW_INCLUDE_NONE)
 
 

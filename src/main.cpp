@@ -1,33 +1,41 @@
-#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include <fmt/core.h>
-#include <fmt/color.h>
+#include <glad/glad.h>
+
+#include "types.h"
 
 
 int main(void)
 {
-    GLFWwindow* window;
 
-    /* Initialize the library */
+    //Initializing GLFW
     if (!glfwInit())
         return -1;
 
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1280, 720, "My window", NULL, NULL);
+    //Providing OpenGL hint to GLFW
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    fmt::print(fg(fmt::color::crimson) | fmt::emphasis::bold,
-        "Hello, {}!\n", "world");
 
+    //Creating a window
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "My window", NULL, NULL);
+
+    //If the window could not be created
     if (!window)
     {
         glfwTerminate();
         return -1;
     }
 
-    /* Make the window's context current */
+    //Making window current rendering context
     glfwMakeContextCurrent(window);
 
-    /* Loop until the user closes the window */
+    //Loading OpenGL mappings
+    gladLoadGL();
+
+    glViewport(0, 0, 1280, 720);
+
+    //Main loop
     while (!glfwWindowShouldClose(window))
     {
 
@@ -39,6 +47,7 @@ int main(void)
         glfwPollEvents();
     }
 
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }
