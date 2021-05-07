@@ -11,18 +11,6 @@ add_executable(${PROJECT_NAME} ${sources})
 
 #Load Dependecies
 #########################################################################
-#Linking to GLFW
-add_subdirectory("${PROJECT_SOURCE_DIR}/vendor/GLFW")
-
-set(GLFW_BUILD_TESTS "Build the GLFW test programs" OFF)
-set(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" OFF)
-set(GLFW_BUILD_DOCS "Build the GLFW documentation" OFF)
-set(GLFW_INSTALL "Generate installation target" OFF)
-set(GLFW_VULKAN_STATIC "Assume the Vulkan loader is linked with the application" OFF)
-
-target_link_libraries(${PROJECT_NAME} glfw ${GLFW_LIBRARIES})
-set_target_properties(glfw PROPERTIES FOLDER "external-library")
-
 
 #Add glad
 add_subdirectory("${PROJECT_SOURCE_DIR}/vendor/glad")
@@ -30,18 +18,36 @@ target_link_libraries(${PROJECT_NAME} glad)
 target_include_directories(${PROJECT_NAME} PRIVATE "vendor/glad/include")
 set_target_properties(glad PROPERTIES FOLDER "external-library")
 
+
+
+#Add GLFW
+
+#GLFW switches
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "Build the GLFW test programs" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Build the GLFW example programs" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "Build the GLFW documentation" FORCE)
+set(GLFW_INSTALL OFF CACHE BOOL "Generate installation target" FORCE)
+set(GLFW_UNINSTALL OFF CACHE BOOL "Generate installation target" FORCE)
+set(GLFW_VULKAN_STATIC OFF CACHE BOOL "Assume the Vulkan loader is linked with the application" FORCE)
+
+add_subdirectory("${PROJECT_SOURCE_DIR}/vendor/GLFW")
+target_link_libraries(${PROJECT_NAME} glfw ${GLFW_LIBRARIES})
+set_target_properties(glfw PROPERTIES FOLDER "external-library")
+
+
 #Add fmt
+#fmt switches
+set(FMT_DOC OFF CACHE BOOL "Generate the doc target." FORCE)
+set(FMT_INSTALL OFF CACHE BOOL "Generate the install target." FORCE)
+set(FMT_TEST OFF CACHE BOOL "Generate the test target." FORCE)
+set(FMT_FUZZ OFF CACHE BOOL "Generate the fuzz target." FORCE)
+set(FMT_CUDA_TEST OFF CACHE BOOL "Generate the cuda-test target." FORCE)
+set(FMT_OS OFF CACHE BOOL "Include core requiring OS (Windows/Posix) " FORCE)
+
 add_subdirectory("${PROJECT_SOURCE_DIR}/vendor/fmt")
-
-set(FMT_DOC "Generate the doc target." OFF)
-set(FMT_INSTALL "Generate the install target." OFF)
-set(FMT_TEST "Generate the test target." OFF)
-set(FMT_FUZZ "Generate the fuzz target." OFF)
-set(FMT_CUDA_TEST "Generate the cuda-test target." OFF)
-set(FMT_OS "Include core requiring OS (Windows/Posix) " ON)
-
 target_link_libraries(${PROJECT_NAME} fmt)
 set_target_properties(fmt PROPERTIES FOLDER "external-library")
+
 #########################################################################
 
 
