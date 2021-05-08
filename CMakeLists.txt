@@ -57,7 +57,13 @@ list(APPEND project-deps-list fmt)
 #########################################################################
 
 foreach(target ${project-deps-list})
-    set_target_properties(${target} PROPERTIES FOLDER "external-library")
+    set_target_properties(${target}
+    PROPERTIES 
+        FOLDER "external-library"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        )
 endforeach(target ${project-deps-list})
 
 #########################################################################
@@ -73,6 +79,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE project-deps)
 
 #Advanced setup
 set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+set_target_properties(${PROJECT_NAME} PROPERTIES 
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    )
 
 
 #Preprocessor Defines
