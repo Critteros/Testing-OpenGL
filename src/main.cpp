@@ -2,10 +2,13 @@
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
-
-
+#include <fmt/core.h>
 
 #include "types.h"
+#include "timer.h"
+
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 800
 
 
 int main(void)
@@ -16,13 +19,15 @@ int main(void)
         return -1;
 
     //Providing OpenGL hint to GLFW
-    //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 
 
     //Creating a window
-    GLFWwindow* window = glfwCreateWindow(800, 800, "My window", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "My window", NULL, NULL);
+   
 
     //If the window could not be created
     if (!window)
@@ -33,17 +38,22 @@ int main(void)
 
     //Making window current rendering context
     glfwMakeContextCurrent(window);
+    //glfwSwapInterval(0);
 
     //Loading OpenGL mappings
     gladLoadGL();
-    //glViewport(0, 0, 1280, 1280);
+
+    //Initial ViewPort size for OpenGL to render in
+    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 
-    std::cout << "OpenGl Version: ";
-    std::cout << glGetString(GL_VERSION) << std::endl;
+    std::cout << "OpenGl Version: " << glGetString(GL_VERSION) << std::endl;
+    
 
-    //first x second y
-    f32 vertexes[] = {
+
+    f32 data1[] =
+    {
+        //Leg1
         -0.6f, -0.7f,
         -0.3f, -0.7f,
         -0.6f, -0.5f,
@@ -51,7 +61,11 @@ int main(void)
         -0.6f, -0.5f,
         -0.3f, -0.5f,
         -0.3f, -0.7f,
+    };
 
+    f32 data2[] =
+    {
+        //Leg2
         0.6f, -0.7f,
         0.3f, -0.7f,
         0.6f, -0.5f,
@@ -59,47 +73,74 @@ int main(void)
         0.6f, -0.5f,
         0.3f, -0.5f,
         0.3f, -0.7f,
+    };
 
-
+    f32 data3[] =
+    {
+        //Body
         -0.4f, -0.5f,
-        0.4f, -0.5f,
-        -0.4f, 0.8f,
+         0.4f, -0.5f,
+        -0.4f,  0.8f,
 
-        0.4f, 0.8f,
-        0.4f, -0.5f,
-        -0.4f, 0.8f,
+         0.4f,  0.8f,
+         0.4f, -0.5f,
+        -0.4f,  0.8f,
+    };
 
-
+    f32 data4[] =
+    {
+        //Eye
         -0.2f, 0.4f,
         -0.2f, 0.6f,
-        0.2f, 0.4f,
+         0.2f, 0.4f,
 
 
          0.2f, 0.6f,
         -0.2f, 0.6f,
          0.2f, 0.4f,
-
     };
 
 
 
 
-    int number_of_triangles = (sizeof(vertexes) / sizeof(f32)) / 6 * 3;
 
 
-    unsigned int vertex_buffer, vertex_array, vertex_buffer_2;
+    u32 vertex_array;
+    //Generating Vertex Array
+    glGenVertexArrays(1, &vertex_array);
+    glBindVertexArray(vertex_array);
 
-    //glGenVertexArrays(1, &vertex_array);
-    //glBindVertexArray(vertex_array);
+    
+    u32 buffer_1, leg1, leg2, body, eye;
+    //Generating buffers
+    glGenBuffers(1, &buffer_1);
+    glGenBuffers(1, &leg1);
+    glGenBuffers(1, &leg2);
+    glGenBuffers(1, &body);
+    glGenBuffers(1, &eye);
 
-    glGenBuffers(1, &vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexes), vertexes, GL_STATIC_DRAW);
 
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(f32), 0);
-    glEnableVertexAttribArray(0);
+    //Loading to leg1
+    glBindBuffer(GL_ARRAY_BUFFER, leg1);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data1), data1, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    //Loading to leg2
+    glBindBuffer(GL_ARRAY_BUFFER, leg2);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data2), data2, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    ////Loading to body
+    glBindBuffer(GL_ARRAY_BUFFER, body);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data3), data3, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+    ////Loading to eye
+    glBindBuffer(GL_ARRAY_BUFFER, eye);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data4), data4, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
 
@@ -127,7 +168,7 @@ int main(void)
 
 
     //Compiling Vertex shader
-    unsigned int v_sh = glCreateShader(GL_VERTEX_SHADER);
+    u32 v_sh = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(v_sh, 1, &vertexShaderSource, NULL);
     glCompileShader(v_sh);
 
@@ -145,7 +186,7 @@ int main(void)
     }
 
     //Compiling Fragment shader
-    unsigned int f_sh = glCreateShader(GL_FRAGMENT_SHADER);
+    u32 f_sh = glCreateShader(GL_FRAGMENT_SHADER);
     const char* f_sh_source = fragmentShader.c_str();
     glShaderSource(f_sh, 1, &f_sh_source, nullptr);
     glCompileShader(f_sh);
@@ -163,7 +204,7 @@ int main(void)
         free(message);
     }
 
-    unsigned int program = glCreateProgram();
+    u32 program = glCreateProgram();
 
     glAttachShader(program, v_sh);
     glAttachShader(program, f_sh);
@@ -187,28 +228,50 @@ int main(void)
 
 
 
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    // Put this in your class somewhere
+    CTimer m_timer;
+
+    // Initialize the timer using
+    m_timer.Init();
+    m_timer.Update();
 
     //Main loop
     while (!glfwWindowShouldClose(window))
     {
+        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        //Cia³o
+        m_timer.Update();
+        //Rendering
 
-        glUniform4f(location, 1.0f, 0.0f, 0.0f, 1.0f);
-        glDrawArrays(GL_TRIANGLES, 0, 6 * 3);
+        glUniform4f(location, 0.863f, 0.078f, 0.235f, 1.0f);
+        //Leg1
+        glBindBuffer(GL_ARRAY_BUFFER, leg1);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(f32), 0);
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, 2 * 3);
+
+        //Leg2
+        glBindBuffer(GL_ARRAY_BUFFER, leg2);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(f32), 0);
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, 2 * 3);
+
+        //Body
+        glBindBuffer(GL_ARRAY_BUFFER, body);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(f32), 0);
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, 2 * 3);
 
 
-
-
-
+        //Eye
+        glBindBuffer(GL_ARRAY_BUFFER, eye);
         glUniform4f(location, 1.0f, 1.0f, 1.0f, 1.0f);
-        glDrawArrays(GL_TRIANGLES, 3 * 6, 2 * 3);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(f32), 0);
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, 2 * 3);
 
-
-
-
+        fmt::print("FPS: {}\n", (i32)m_timer.GetFPS());
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

@@ -76,6 +76,7 @@ foreach(target ${project-deps-list})
     target_link_libraries(project-deps INTERFACE ${target})
 endforeach()
 target_link_libraries(${PROJECT_NAME} PRIVATE project-deps)
+target_link_libraries(${PROJECT_NAME} PRIVATE Winmm.lib)
 
 
 #Advanced setup
