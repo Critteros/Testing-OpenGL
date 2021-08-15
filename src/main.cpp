@@ -6,6 +6,7 @@
 #include <fmt/color.h>
 
 #include "types.h"
+#include "timer.h"
 
 
 #define WINDOW_WIDTH 800
@@ -31,7 +32,7 @@ MessageCallback(GLenum source,
     break;
 
     case(GL_DEBUG_SEVERITY_MEDIUM):
-        fmt::print(//fg(fmt::color::yellow),
+        fmt::print(fg(fmt::color::yellow),
             "[GL_MEDIUM]: type = {} \n\t{}\n", type, message);
     break;
 
@@ -78,7 +79,7 @@ int main(void)
 
     //Making window current rendering context
     glfwMakeContextCurrent(window);
-    //glfwSwapInterval(0);
+    glfwSwapInterval(0);
 
     //Loading OpenGL mappings
     gladLoadGL();
@@ -277,14 +278,33 @@ int main(void)
 
  
 
-    
+    // Put this in your class somewhere
+    CTimer m_timer;
 
+    // Initialize the timer using
+    m_timer.Init();
+
+    // Call this everytime you call draw your scene
+    m_timer.Update();
+
+   
+    int x = 0;
     //Main loop
     while (!glfwWindowShouldClose(window))
     {
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        m_timer.Update();
+
+        x++;
+        if (x == 60)
+        {
+            // Call this to get the frames/sec
+            std::cout << "FPS: " << m_timer.GetFPS() << std::endl;
+            x = 0;
+        }
+        
        
         //Rendering
         glUseProgram(program);
